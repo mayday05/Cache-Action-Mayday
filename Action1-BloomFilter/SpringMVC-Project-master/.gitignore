@@ -1,0 +1,13 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# Temp files
+tmp/

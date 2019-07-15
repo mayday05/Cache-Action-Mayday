@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>SpringMVC-Project</artifactId>
+        <groupId>com.doodl6</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>springmvc-web</artifactId>
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.doodl6</groupId>
+            <artifactId>springmvc-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.doodl6</groupId>
+            <artifactId>springmvc-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>${finalName}</finalName>
+
+        <!-- 开启maven的资源过滤 -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <port>2018</port>
+                    <path>/</path>
+                    <uriEncoding>UTF-8</uriEncoding>
+                    <systemProperties>
+                        <JAVA_OPTS>-Xms256m -Xmx1024m</JAVA_OPTS>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+            <!-- 要使用maven的profile机制的话需要覆盖maven的默认war插件，需要制定下不同的配置文件复制。 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${configPath}</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                        </resource>
+                    </webResources>
+                    <!-- 打包需要忽略的文件配置-->
+                    <packagingExcludes>${packagingExcludes}</packagingExcludes>
+                </configuration>
+            </plugin>
+
+            <!-- 制定profile打包的时候为 UTF-8，不然会有乱码问题。 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!-- 属性配置 -->
+            <properties>
+                <finalName>SpringMVC-Project-dev</finalName>
+                <configPath>src/main/config/dev</configPath>
+                <packagingExcludes>logs/,**/*.html,**/*.css,**/*.less,**/*.js,**/*.png,**/*.jpg,**/*.gif
+                </packagingExcludes>
+            </properties>
+            <build>
+                <!-- 告诉资源过滤该从哪个文件读取key-value值去进行资源替换(${}) -->
+                <filters>
+                    <filter>src/main/properties/dev.properties</filter>
+                </filters>
+            </build>
+        </profile>
+
+        <profile>
+            <id>test</id>
+            <properties>
+                <finalName>SpringMVC-Project-test</finalName>
+                <configPath>src/main/config/test</configPath>
+                <packagingExcludes>logs/,**/*.html,**/*.css,**/*.less,**/*.js,**/*.png,**/*.jpg,**/*.gif
+                </packagingExcludes>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/properties/test.properties</filter>
+                </filters>
+            </build>
+        </profile>
+
+        <profile>
+            <id>production</id>
+            <properties>
+                <finalName>SpringMVC-Project-production</finalName>
+                <configPath>src/main/config/production</configPath>
+                <packagingExcludes/>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/properties/production.properties</filter>
+                </filters>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
